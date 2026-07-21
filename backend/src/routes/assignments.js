@@ -10,9 +10,11 @@ const { verifyToken } = require("../middleware/auth");
 const { requireRole } = require("../middleware/roleCheck");
 const upload = require("../config/multer");
 
-router.get("/batches", verifyToken, getBatches);
+// PUBLIC route — no token needed (for registration page)
+router.get("/batches/public", getBatches);
 
-// upload.single('file') handles the file field named 'file'
+// PROTECTED routes
+router.get("/batches", verifyToken, getBatches);
 router.post(
   "/",
   verifyToken,

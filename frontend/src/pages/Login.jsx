@@ -49,6 +49,23 @@ export default function Login() {
     }
   };
 
+  const inputStyle = {
+    width: "100%",
+    padding: "10px 14px",
+    border: "1px solid #ddd",
+    borderRadius: "8px",
+    fontSize: "15px",
+    boxSizing: "border-box",
+  };
+
+  const labelStyle = {
+    display: "block",
+    marginBottom: "6px",
+    fontSize: "14px",
+    fontWeight: 500,
+    color: "#333",
+  };
+
   return (
     <div
       style={{
@@ -69,26 +86,27 @@ export default function Login() {
           maxWidth: "400px",
         }}
       >
-        {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "2rem" }}>
           <h1
             style={{
               fontSize: "28px",
               fontWeight: 700,
-              color: "#000000",
+              color: "#2563eb",
               marginBottom: "6px",
             }}
           >
-            ⚡TaskPulse
+            TaskPulse
           </h1>
           <p style={{ color: "#666", fontSize: "14px", margin: 0 }}>
             Stay ahead of your deadlines.
           </p>
         </div>
-        {/* ── FORGOT PASSWORD VIEW ── */}
+
         {showForgot ? (
           <>
-            <h3 style={{ marginBottom: "0.5rem" }}>Reset Password</h3>
+            <h3 style={{ marginBottom: "0.5rem", fontSize: "18px" }}>
+              Reset Password
+            </h3>
             <p
               style={{
                 color: "#666",
@@ -116,29 +134,14 @@ export default function Login() {
 
             <form onSubmit={handleForgot}>
               <div style={{ marginBottom: "1rem" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                  }}
-                >
-                  Email
-                </label>
+                <label style={labelStyle}>Email</label>
                 <input
                   type="email"
                   value={forgotEmail}
                   onChange={(e) => setForgotEmail(e.target.value)}
                   required
                   placeholder="your@email.com"
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    fontSize: "15px",
-                  }}
+                  style={inputStyle}
                 />
               </div>
               <button
@@ -175,12 +178,11 @@ export default function Login() {
                   textDecoration: "underline",
                 }}
               >
-                ← Back to Login
+                Back to Login
               </button>
             </div>
           </>
         ) : (
-          /* ── LOGIN VIEW ── */
           <>
             {error && (
               <div
@@ -199,43 +201,19 @@ export default function Login() {
 
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: "1rem" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                  }}
-                >
-                  Email
-                </label>
+                <label style={labelStyle}>Email</label>
                 <input
                   type="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
                   placeholder="your@email.com"
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    fontSize: "15px",
-                  }}
+                  style={inputStyle}
                 />
               </div>
 
               <div style={{ marginBottom: "1.5rem" }}>
-                <label
-                  style={{
-                    display: "block",
-                    marginBottom: "6px",
-                    fontSize: "14px",
-                    fontWeight: 500,
-                  }}
-                >
-                  Password
-                </label>
+                <label style={labelStyle}>Password</label>
                 <input
                   type="password"
                   value={form.password}
@@ -244,13 +222,7 @@ export default function Login() {
                   }
                   required
                   placeholder="••••••••"
-                  style={{
-                    width: "100%",
-                    padding: "10px 14px",
-                    border: "1px solid #ddd",
-                    borderRadius: "8px",
-                    fontSize: "15px",
-                  }}
+                  style={inputStyle}
                 />
               </div>
 
@@ -286,6 +258,27 @@ export default function Login() {
                   }}
                 >
                   Forgot password?
+                </button>
+              </div>
+
+              <div style={{ textAlign: "center", marginTop: "0.5rem" }}>
+                <span style={{ color: "#666", fontSize: "14px" }}>
+                  New user?{" "}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => navigate("/register")}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "#2563eb",
+                    cursor: "pointer",
+                    fontSize: "14px",
+                    textDecoration: "underline",
+                    padding: 0,
+                  }}
+                >
+                  Create account
                 </button>
               </div>
             </form>

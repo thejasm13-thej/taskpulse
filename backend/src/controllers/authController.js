@@ -10,7 +10,17 @@ const resetTokens = {};
 // ─── REGISTER ─────────────────────────────────────────────────────
 async function register(req, res) {
   try {
-    const { name, email, password, role, batch_id } = req.body;
+    const { name, email, password, role, batch_id, faculty_code } = req.body;
+
+    // If registering as faculty check the secret code
+    if (role === "faculty") {
+      if (!faculty_code || faculty_code !== process.env.FACULTY_CODE) {
+        return res.status(403).json({
+          error: "Invalid faculty code. Contact your administrator.",
+        });
+      }
+    }
+
     const hash = await bcrypt.hash(password, 10);
     await User.create({
       name,

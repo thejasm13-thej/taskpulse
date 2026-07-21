@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import client from "../api/axiosClient";
 import Navbar from "../components/Navbar";
 
 export default function PostAssignment() {
@@ -11,18 +10,20 @@ export default function PostAssignment() {
     due_date: "",
     description: "",
   });
+  const [file, setFile] = useState(null);
   const [batches, setBatches] = useState([]);
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch real batch names on load
   useEffect(() => {
-    client
-      .get("/assignments/batches")
-      .then((res) => setBatches(res.data.batches || []))
-      .catch(() => setBatches([]));
+    const token = localStorage.getItem("token");
+    fetch("http://localhost:5000/api/assignments/batches", {
+      headers: { Authorization: "Bearer " + token },
+    })
+      .then((r) => r.json())
+      .then((d) => setBatches(d.batches || []));
   }, []);
 
   const handleSubmit = async (e) => {
@@ -30,8 +31,29 @@ export default function PostAssignment() {
     setLoading(true);
     setStatus("");
     setError("");
+
     try {
-      await client.post("/assignments", form);
+      const token = localStorage.getItem("token");
+
+      // Use FormData to send both text fields and file together
+      const formData = new FormData();
+      formData.append("title", form.title);
+      formData.append("subject", form.subject);
+      formData.append("batch_id", form.batch_id);
+      formData.append("due_date", form.due_date);
+      formData.append("description", form.description);
+      if (file) formData.append("file", file);
+
+      const res = await fetch("http://localhost:5000/api/assignments", {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token },
+        body: formData,
+        // Do NOT set Content-Type header — browser sets it automatically for FormData
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Something went wrong");
+
       setStatus("✅ Assignment posted! Students will be notified by email.");
       setForm({
         title: "",
@@ -40,8 +62,10 @@ export default function PostAssignment() {
         due_date: "",
         description: "",
       });
+      setFile(null);
+      document.getElementById("fileInput").value = "";
     } catch (err) {
-      setError(err.response?.data?.error || "Something went wrong");
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -181,7 +205,7 @@ export default function PostAssignment() {
             </div>
 
             {/* Description */}
-            <div style={{ marginBottom: "1.5rem" }}>
+            <div style={{ marginBottom: "1rem" }}>
               <label style={labelStyle}>Description (optional)</label>
               <textarea
                 value={form.description}
@@ -192,6 +216,80 @@ export default function PostAssignment() {
                 placeholder="Assignment details, submission format, references..."
                 style={{ ...inputStyle, resize: "vertical" }}
               />
+            </div>
+
+            {/* File Upload */}
+            <div style={{ marginBottom: "1.5rem" }}>
+              <label style={labelStyle}>Attach File (optional)</label>
+              <div
+                style={{
+                  border: "2px dashed #ddd",
+                  borderRadius: "8px",
+                  padding: "20px",
+                  textAlign: "center",
+                  background: "#fafafa",
+                  cursor: "pointer",
+                }}
+                onClick={() => document.getElementById("fileInput").click()}
+              >
+                {file ? (
+                  <div>
+                    <p style={{ color: "#16a34a", fontWeight: 500, margin: 0 }}>
+                      📎 {file.name}
+                    </p>
+                    <p
+                      style={{
+                        color: "#888",
+                        fontSize: "12px",
+                        margin: "4px 0 0",
+                      }}
+                    >
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <p style={{ color: "#888", margin: 0, fontSize: "14px" }}>
+                      📁 Click to upload a file
+                    </p>
+                    <p
+                      style={{
+                        color: "#aaa",
+                        fontSize: "12px",
+                        margin: "4px 0 0",
+                      }}
+                    >
+                      PDF, DOC, PPT, XLS, Images, ZIP — max 10MB
+                    </p>
+                  </div>
+                )}
+              </div>
+              <input
+                id="fileInput"
+                type="file"
+                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.zip"
+                onChange={(e) => setFile(e.target.files[0])}
+                style={{ display: "none" }}
+              />
+              {file && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFile(null);
+                    document.getElementById("fileInput").value = "";
+                  }}
+                  style={{
+                    marginTop: "6px",
+                    background: "none",
+                    border: "none",
+                    color: "#dc2626",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                  }}
+                >
+                  ✕ Remove file
+                </button>
+              )}
             </div>
 
             <button

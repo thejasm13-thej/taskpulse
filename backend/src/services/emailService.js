@@ -123,15 +123,38 @@ async function sendNewAssignmentNotification(assignment) {
               })}
             </td>
           </tr>
-          ${
-            assignment.description
-              ? `
-          <tr>
-            <td style="padding: 8px 0; color: #64748b; vertical-align: top;">Details</td>
-            <td style="padding: 8px 0; color: #1e293b;">${assignment.description}</td>
-          </tr>`
-              : ""
-          }
+         ${
+           assignment.description
+             ? `
+<tr>
+  <td style="padding: 8px 0; color: #64748b; vertical-align: top;">Details</td>
+  <td style="padding: 8px 0; color: #1e293b;">${assignment.description}</td>
+</tr>`
+             : ""
+         }
+${
+  assignment.file_original
+    ? `
+<tr>
+  <td style="padding: 8px 0; color: #64748b; vertical-align: top;">Attachment</td>
+  <td style="padding: 8px 0;">
+    <a href="http://localhost:5000/uploads/${assignment.file_name}"
+      style="
+        display: inline-block;
+        background: #eff6ff;
+        color: #2563eb;
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        text-decoration: none;
+        font-weight: 600;
+        border: 1px solid #bfdbfe;">
+      📎 Download: ${assignment.file_original}
+    </a>
+  </td>
+</tr>`
+    : ""
+}
         </table>
         <div style="background: #dcfce7; padding: 12px 16px;
           border-radius: 8px; margin-top: 16px;">

@@ -11,6 +11,11 @@ async function postAssignment(req, res) {
     const { title, subject, batch_id, due_date, description } = req.body;
     const faculty_id = req.user.id;
 
+    // File info from multer (if file was uploaded)
+    const file_name = req.file ? req.file.filename : null;
+    const file_path = req.file ? req.file.path : null;
+    const file_original = req.file ? req.file.originalname : null;
+
     const assignment = await Assignment.create({
       title,
       subject,
@@ -18,6 +23,9 @@ async function postAssignment(req, res) {
       due_date,
       description,
       faculty_id,
+      file_name,
+      file_path,
+      file_original,
     });
 
     const due = new Date(due_date);

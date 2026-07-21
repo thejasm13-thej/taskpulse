@@ -10,6 +10,9 @@ const Assignment = sequelize.define(
     batch_id: { type: DataTypes.INTEGER, allowNull: false },
     faculty_id: { type: DataTypes.INTEGER, allowNull: false },
     due_date: { type: DataTypes.DATE, allowNull: false },
+    file_name: { type: DataTypes.STRING, allowNull: true },
+    file_path: { type: DataTypes.STRING, allowNull: true },
+    file_original: { type: DataTypes.STRING, allowNull: true },
   },
   {
     tableName: "assignments",
@@ -19,7 +22,6 @@ const Assignment = sequelize.define(
   },
 );
 
-// Association
 const Batch = require("./Batch");
 Assignment.belongsTo(Batch, { foreignKey: "batch_id", as: "batch" });
 

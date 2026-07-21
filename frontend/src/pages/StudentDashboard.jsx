@@ -12,7 +12,7 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("http://localhost:5000/api/assignments/upcoming", {
+    fetch("taskpulse-production-a975.up.railway.app/uploads/", {
       headers: { Authorization: "Bearer " + token },
     })
       .then(function (r) {
@@ -131,7 +131,8 @@ export default function StudentDashboard() {
     const label = getBadgeLabel(days);
     const dueDate = new Date(a.due_date).toLocaleString();
     const batch = a.batch ? a.batch.department + " - " + a.batch.name : "";
-    const fileUrl = "http://localhost:5000/uploads/" + a.file_name;
+    const fileUrl =
+      "taskpulse-production-a975.up.railway.app/uploads/" + a.file_name;
     const hasFile = a.file_original ? true : false;
     const origName = a.file_original ? a.file_original : "";
 

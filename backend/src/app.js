@@ -4,11 +4,13 @@ const path = require("path");
 require("dotenv").config();
 
 const app = express();
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://your-vercel-app.vercel.app"],
+    origin: ["http://localhost:5173", "https://thejas-taskpulse.netlify.app"],
   }),
 );
+
 app.use(express.json());
 
 // Serve uploaded files publicly

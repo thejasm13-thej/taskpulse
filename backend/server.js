@@ -3,6 +3,7 @@ const sequelize = require("./src/config/database");
 require("./src/scheduler/reminderJob");
 require("dotenv").config();
 
+// Railway assigns PORT automatically — always use process.env.PORT
 const PORT = process.env.PORT || 5000;
 
 sequelize
@@ -12,8 +13,8 @@ sequelize
     return sequelize.sync();
   })
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`✅ Server running on port ${PORT}`);
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log("✅ Server running on port " + PORT);
     });
   })
   .catch((err) => {

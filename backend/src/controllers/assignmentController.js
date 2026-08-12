@@ -60,12 +60,11 @@ async function postAssignment(req, res) {
 async function listUpcomingDeadlines(req, res) {
   try {
     const now = new Date();
-    const sevenDays = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
 
     const assignments = await Assignment.findAll({
       where: {
         batch_id: req.user.batch_id,
-        due_date: { [Op.between]: [now, sevenDays] },
+        due_date: { [Op.gte]: now }, // show ALL future assignments
       },
       include: [
         {

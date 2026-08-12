@@ -12,7 +12,7 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    fetch("taskpulse-production-a975.up.railway.app/uploads/", {
+    fetch("http://localhost:5000/api/assignments/upcoming", {
       headers: { Authorization: "Bearer " + token },
     })
       .then(function (r) {
@@ -82,10 +82,12 @@ export default function StudentDashboard() {
   const dueToday = assignments.filter(function (a) {
     return getDaysLeft(a.due_date) <= 1;
   }).length;
-  const dueWeek = assignments.length;
+
   const urgent = assignments.filter(function (a) {
     return getDaysLeft(a.due_date) <= 2;
   }).length;
+
+  const total = assignments.length;
 
   function StatCard(props) {
     return (
@@ -131,8 +133,7 @@ export default function StudentDashboard() {
     const label = getBadgeLabel(days);
     const dueDate = new Date(a.due_date).toLocaleString();
     const batch = a.batch ? a.batch.department + " - " + a.batch.name : "";
-    const fileUrl =
-      "taskpulse-production-a975.up.railway.app/uploads/" + a.file_name;
+    const fileUrl = "http://localhost:5000/uploads/" + a.file_name;
     const hasFile = a.file_original ? true : false;
     const origName = a.file_original ? a.file_original : "";
 
@@ -185,14 +186,7 @@ export default function StudentDashboard() {
               >
                 {a.subject}
               </span>
-              <span
-                style={{
-                  color: "#888",
-                  fontSize: "12px",
-                }}
-              >
-                {batch}
-              </span>
+              <span style={{ color: "#888", fontSize: "12px" }}>{batch}</span>
             </div>
           </div>
           <span
@@ -280,18 +274,18 @@ export default function StudentDashboard() {
       >
         <div style={{ marginBottom: "1.5rem" }}>
           <h2 style={{ fontSize: "22px", fontWeight: 600, color: "#1e293b" }}>
-            My Deadlines
+            My Assignments
           </h2>
           <p style={{ color: "#666", fontSize: "14px", marginTop: "4px" }}>
-            Welcome, {auth.user ? auth.user.name : ""} - assignments due in the
-            next 7 days
+            Welcome, {auth.user ? auth.user.name : ""} - all upcoming
+            assignments
           </p>
         </div>
 
         {loading ? (
-          <p style={{ color: "#666" }}>Loading deadlines...</p>
+          <p style={{ color: "#666" }}>Loading assignments...</p>
         ) : (
-          <>
+          <div>
             <div
               style={{
                 display: "flex",
@@ -306,7 +300,7 @@ export default function StudentDashboard() {
                 label="Urgent (2 days)"
                 color="#d97706"
               />
-              <StatCard value={dueWeek} label="Due This Week" color="#2563eb" />
+              <StatCard value={total} label="Total Upcoming" color="#2563eb" />
             </div>
 
             {assignments.length === 0 ? (
@@ -321,7 +315,7 @@ export default function StudentDashboard() {
               >
                 <p style={{ fontSize: "48px", marginBottom: "1rem" }}>🎉</p>
                 <p style={{ color: "#666", fontWeight: 500 }}>
-                  No upcoming deadlines in the next 7 days.
+                  No upcoming assignments.
                 </p>
                 <p
                   style={{ color: "#999", fontSize: "14px", marginTop: "4px" }}
@@ -330,7 +324,7 @@ export default function StudentDashboard() {
                 </p>
               </div>
             ) : (
-              <>
+              <div>
                 <div
                   style={{
                     display: "flex",
@@ -412,9 +406,9 @@ export default function StudentDashboard() {
                     })}
                   </div>
                 )}
-              </>
+              </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

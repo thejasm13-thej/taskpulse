@@ -4,16 +4,14 @@ const {
   postAssignment,
   listUpcomingDeadlines,
   listAllAssignments,
+  deleteAssignment,
 } = require("../controllers/assignmentController");
 const { getBatches } = require("../controllers/batchController");
 const { verifyToken } = require("../middleware/auth");
 const { requireRole } = require("../middleware/roleCheck");
 const upload = require("../config/multer");
 
-// PUBLIC route — no token needed (for registration page)
 router.get("/batches/public", getBatches);
-
-// PROTECTED routes
 router.get("/batches", verifyToken, getBatches);
 router.post(
   "/",
@@ -29,5 +27,6 @@ router.get(
   listUpcomingDeadlines,
 );
 router.get("/all", verifyToken, requireRole("faculty"), listAllAssignments);
+router.delete("/:id", verifyToken, requireRole("faculty"), deleteAssignment);
 
 module.exports = router;

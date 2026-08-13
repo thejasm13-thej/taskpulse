@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
+import Layout from "../components/Layout";
 
 export default function PostAssignment() {
   const [form, setForm] = useState({
@@ -22,8 +22,15 @@ export default function PostAssignment() {
     fetch("http://localhost:5000/api/assignments/batches", {
       headers: { Authorization: "Bearer " + token },
     })
-      .then((r) => r.json())
-      .then((d) => setBatches(d.batches || []));
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (d) {
+        setBatches(d.batches || []);
+      })
+      .catch(function () {
+        setBatches([]);
+      });
   }, []);
 
   const handleSubmit = async (e) => {
@@ -34,8 +41,6 @@ export default function PostAssignment() {
 
     try {
       const token = localStorage.getItem("token");
-
-      // Use FormData to send both text fields and file together
       const formData = new FormData();
       formData.append("title", form.title);
       formData.append("subject", form.subject);
@@ -48,13 +53,14 @@ export default function PostAssignment() {
         method: "POST",
         headers: { Authorization: "Bearer " + token },
         body: formData,
-        // Do NOT set Content-Type header — browser sets it automatically for FormData
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Something went wrong");
 
-      setStatus("✅ Assignment posted! Students will be notified by email.");
+      setStatus(
+        "Assignment posted successfully! Students will be notified by email.",
+      );
       setForm({
         title: "",
         subject: "",
@@ -63,7 +69,8 @@ export default function PostAssignment() {
         description: "",
       });
       setFile(null);
-      document.getElementById("fileInput").value = "";
+      const fileInput = document.getElementById("fileInput");
+      if (fileInput) fileInput.value = "";
     } catch (err) {
       setError(err.message);
     } finally {
@@ -74,10 +81,12 @@ export default function PostAssignment() {
   const inputStyle = {
     width: "100%",
     padding: "10px 14px",
-    border: "1px solid #ddd",
+    border: "1px solid var(--border)",
     borderRadius: "8px",
     fontSize: "15px",
-    background: "white",
+    background: "var(--card)",
+    color: "var(--text)",
+    boxSizing: "border-box",
   };
 
   const labelStyle = {
@@ -85,50 +94,71 @@ export default function PostAssignment() {
     marginBottom: "6px",
     fontSize: "14px",
     fontWeight: 500,
+    color: "var(--text)",
   };
 
   return (
-    <div>
-      <Navbar />
-      <div
-        style={{ maxWidth: "600px", margin: "2rem auto", padding: "0 1rem" }}
-      >
-        <button
-          onClick={() => navigate("/faculty")}
-          style={{
-            background: "none",
-            border: "none",
-            color: "#2563eb",
-            cursor: "pointer",
-            marginBottom: "1rem",
-            fontSize: "14px",
-          }}
-        >
-          ← Back to Dashboard
-        </button>
+    <Layout>
+      <div style={{ maxWidth: "600px", margin: "0 auto" }}>
+        <div style={{ marginBottom: "1.5rem" }}>
+          <button
+            onClick={function () {
+              navigate("/faculty");
+            }}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#2563eb",
+              cursor: "pointer",
+              fontSize: "14px",
+              padding: 0,
+              marginBottom: "8px",
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            Back to Dashboard
+          </button>
+          <h2
+            style={{ fontSize: "24px", fontWeight: 700, color: "var(--text)" }}
+          >
+            Post New Assignment
+          </h2>
+          <p
+            style={{
+              color: "var(--text-muted)",
+              fontSize: "14px",
+              marginTop: "2px",
+            }}
+          >
+            Fill in the details below and notify your students instantly.
+          </p>
+        </div>
 
         <div
           style={{
-            background: "white",
+            background: "var(--card)",
+            borderRadius: "16px",
             padding: "2rem",
-            borderRadius: "12px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
           }}
         >
-          <h2 style={{ marginBottom: "1.5rem" }}>Post New Assignment</h2>
-
           {status && (
             <div
               style={{
                 background: "#dcfce7",
                 color: "#16a34a",
-                padding: "10px 14px",
+                padding: "12px 16px",
                 borderRadius: "8px",
-                marginBottom: "1rem",
+                marginBottom: "1.5rem",
                 fontSize: "14px",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
             >
-              {status}
+              Assignment posted successfully! Students will be notified.
             </div>
           )}
 
@@ -137,9 +167,9 @@ export default function PostAssignment() {
               style={{
                 background: "#fee2e2",
                 color: "#dc2626",
-                padding: "10px 14px",
+                padding: "12px 16px",
                 borderRadius: "8px",
-                marginBottom: "1rem",
+                marginBottom: "1.5rem",
                 fontSize: "14px",
               }}
             >
@@ -148,94 +178,101 @@ export default function PostAssignment() {
           )}
 
           <form onSubmit={handleSubmit}>
-            {/* Title */}
-            <div style={{ marginBottom: "1rem" }}>
+            <div style={{ marginBottom: "1.25rem" }}>
               <label style={labelStyle}>Assignment Title</label>
               <input
                 type="text"
                 value={form.title}
-                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                onChange={function (e) {
+                  setForm({ ...form, title: e.target.value });
+                }}
                 required
                 placeholder="e.g. Binary Search Tree Implementation"
                 style={inputStyle}
               />
             </div>
 
-            {/* Subject */}
-            <div style={{ marginBottom: "1rem" }}>
+            <div style={{ marginBottom: "1.25rem" }}>
               <label style={labelStyle}>Subject</label>
               <input
                 type="text"
                 value={form.subject}
-                onChange={(e) => setForm({ ...form, subject: e.target.value })}
+                onChange={function (e) {
+                  setForm({ ...form, subject: e.target.value });
+                }}
                 required
                 placeholder="e.g. Data Structures"
                 style={inputStyle}
               />
             </div>
 
-            {/* Batch Dropdown */}
-            <div style={{ marginBottom: "1rem" }}>
+            <div style={{ marginBottom: "1.25rem" }}>
               <label style={labelStyle}>Select Batch</label>
               <select
                 value={form.batch_id}
-                onChange={(e) => setForm({ ...form, batch_id: e.target.value })}
+                onChange={function (e) {
+                  setForm({ ...form, batch_id: e.target.value });
+                }}
                 required
                 style={inputStyle}
               >
                 <option value="">-- Select a batch --</option>
-                {batches.map((b) => (
-                  <option key={b.id} value={b.id}>
-                    {b.department} · {b.name} · Year {b.year}
-                  </option>
-                ))}
+                {batches.map(function (b) {
+                  return (
+                    <option key={b.id} value={b.id}>
+                      {b.department} - {b.name} - Year {b.year}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
-            {/* Due Date */}
-            <div style={{ marginBottom: "1rem" }}>
-              <label style={labelStyle}>Due Date & Time</label>
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={labelStyle}>Due Date and Time</label>
               <input
                 type="datetime-local"
                 value={form.due_date}
-                onChange={(e) => setForm({ ...form, due_date: e.target.value })}
+                onChange={function (e) {
+                  setForm({ ...form, due_date: e.target.value });
+                }}
                 required
                 style={inputStyle}
               />
             </div>
 
-            {/* Description */}
-            <div style={{ marginBottom: "1rem" }}>
+            <div style={{ marginBottom: "1.25rem" }}>
               <label style={labelStyle}>Description (optional)</label>
               <textarea
                 value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
+                onChange={function (e) {
+                  setForm({ ...form, description: e.target.value });
+                }}
                 rows={4}
                 placeholder="Assignment details, submission format, references..."
                 style={{ ...inputStyle, resize: "vertical" }}
               />
             </div>
 
-            {/* File Upload */}
             <div style={{ marginBottom: "1.5rem" }}>
               <label style={labelStyle}>Attach File (optional)</label>
               <div
-                style={{
-                  border: "2px dashed #ddd",
-                  borderRadius: "8px",
-                  padding: "20px",
-                  textAlign: "center",
-                  background: "#fafafa",
-                  cursor: "pointer",
+                onClick={function () {
+                  document.getElementById("fileInput").click();
                 }}
-                onClick={() => document.getElementById("fileInput").click()}
+                style={{
+                  border: "2px dashed var(--border)",
+                  borderRadius: "10px",
+                  padding: "24px",
+                  textAlign: "center",
+                  cursor: "pointer",
+                  background: file ? "#f0fdf4" : "var(--bg)",
+                  transition: "all 0.2s",
+                }}
               >
                 {file ? (
                   <div>
-                    <p style={{ color: "#16a34a", fontWeight: 500, margin: 0 }}>
-                      📎 {file.name}
+                    <p style={{ color: "#16a34a", fontWeight: 600, margin: 0 }}>
+                      {file.name}
                     </p>
                     <p
                       style={{
@@ -249,8 +286,15 @@ export default function PostAssignment() {
                   </div>
                 ) : (
                   <div>
-                    <p style={{ color: "#888", margin: 0, fontSize: "14px" }}>
-                      📁 Click to upload a file
+                    <p style={{ fontSize: "24px", margin: "0 0 8px" }}>📁</p>
+                    <p
+                      style={{
+                        color: "var(--text-muted)",
+                        margin: 0,
+                        fontSize: "14px",
+                      }}
+                    >
+                      Click to upload a file
                     </p>
                     <p
                       style={{
@@ -268,26 +312,29 @@ export default function PostAssignment() {
                 id="fileInput"
                 type="file"
                 accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt,.png,.jpg,.jpeg,.zip"
-                onChange={(e) => setFile(e.target.files[0])}
+                onChange={function (e) {
+                  setFile(e.target.files[0]);
+                }}
                 style={{ display: "none" }}
               />
               {file && (
                 <button
                   type="button"
-                  onClick={() => {
+                  onClick={function () {
                     setFile(null);
                     document.getElementById("fileInput").value = "";
                   }}
                   style={{
-                    marginTop: "6px",
+                    marginTop: "8px",
                     background: "none",
                     border: "none",
                     color: "#dc2626",
                     cursor: "pointer",
                     fontSize: "13px",
+                    padding: 0,
                   }}
                 >
-                  ✕ Remove file
+                  Remove file
                 </button>
               )}
             </div>
@@ -297,14 +344,15 @@ export default function PostAssignment() {
               disabled={loading}
               style={{
                 width: "100%",
-                padding: "12px",
+                padding: "13px",
                 background: loading ? "#93c5fd" : "#2563eb",
                 color: "white",
                 border: "none",
-                borderRadius: "8px",
+                borderRadius: "10px",
                 fontSize: "15px",
                 fontWeight: 600,
                 cursor: loading ? "not-allowed" : "pointer",
+                transition: "background 0.2s",
               }}
             >
               {loading ? "Posting..." : "Post Assignment"}
@@ -312,6 +360,6 @@ export default function PostAssignment() {
           </form>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

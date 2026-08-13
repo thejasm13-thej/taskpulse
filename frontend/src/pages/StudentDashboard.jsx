@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Navbar from "../components/Navbar";
+import Layout from "../components/Layout";
 import { useAuth } from "../context/AuthContext";
 
 export default function StudentDashboard() {
@@ -73,38 +73,36 @@ export default function StudentDashboard() {
   }
 
   function getSubjects() {
-    const subjects = assignments.map(function (a) {
+    const s = assignments.map(function (a) {
       return a.subject;
     });
-    return ["All"].concat([...new Set(subjects)]);
+    return ["All"].concat([...new Set(s)]);
   }
 
   const dueToday = assignments.filter(function (a) {
     return getDaysLeft(a.due_date) <= 1;
   }).length;
-
   const urgent = assignments.filter(function (a) {
     return getDaysLeft(a.due_date) <= 2;
   }).length;
-
   const total = assignments.length;
 
   function StatCard(props) {
     return (
       <div
         style={{
-          background: "white",
-          padding: "1.25rem",
+          background: "var(--card)",
           borderRadius: "12px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-          textAlign: "center",
-          borderTop: "4px solid " + props.color,
+          padding: "1.25rem",
           flex: 1,
+          borderTop: "4px solid " + props.color,
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+          textAlign: "center",
         }}
       >
         <p
           style={{
-            fontSize: "32px",
+            fontSize: "28px",
             fontWeight: 700,
             color: props.color,
             margin: 0,
@@ -115,7 +113,7 @@ export default function StudentDashboard() {
         <p
           style={{
             fontSize: "13px",
-            color: "#666",
+            color: "var(--text-muted)",
             margin: "4px 0 0",
           }}
         >
@@ -140,10 +138,10 @@ export default function StudentDashboard() {
     return (
       <div
         style={{
-          background: "white",
-          padding: "1.25rem 1.5rem",
+          background: "var(--card)",
           borderRadius: "12px",
-          boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+          padding: "1.25rem 1.5rem",
+          boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
           borderLeft: "4px solid " + color,
         }}
       >
@@ -160,25 +158,18 @@ export default function StudentDashboard() {
               style={{
                 fontSize: "16px",
                 fontWeight: 600,
-                marginBottom: "4px",
-                color: "#1e293b",
+                marginBottom: "6px",
+                color: "var(--text)",
               }}
             >
               {a.title}
             </h3>
-            <div
-              style={{
-                display: "flex",
-                gap: "8px",
-                alignItems: "center",
-                flexWrap: "wrap",
-              }}
-            >
+            <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
               <span
                 style={{
                   background: "#f1f5f9",
                   color: "#475569",
-                  padding: "2px 8px",
+                  padding: "2px 10px",
                   borderRadius: "20px",
                   fontSize: "12px",
                   fontWeight: 500,
@@ -186,7 +177,19 @@ export default function StudentDashboard() {
               >
                 {a.subject}
               </span>
-              <span style={{ color: "#888", fontSize: "12px" }}>{batch}</span>
+              {batch && (
+                <span
+                  style={{
+                    background: "#f8fafc",
+                    color: "#64748b",
+                    padding: "2px 10px",
+                    borderRadius: "20px",
+                    fontSize: "12px",
+                  }}
+                >
+                  {batch}
+                </span>
+              )}
             </div>
           </div>
           <span
@@ -208,11 +211,11 @@ export default function StudentDashboard() {
         {a.description && (
           <p
             style={{
-              color: "#555",
+              color: "var(--text-muted)",
               fontSize: "14px",
               lineHeight: 1.6,
-              marginBottom: "10px",
               marginTop: "8px",
+              marginBottom: "10px",
             }}
           >
             {a.description}
@@ -224,193 +227,188 @@ export default function StudentDashboard() {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            marginTop: "10px",
-            paddingTop: "10px",
-            borderTop: "1px solid #f1f5f9",
+            marginTop: "12px",
+            paddingTop: "12px",
+            borderTop: "1px solid var(--border)",
           }}
         >
           <p
             style={{
-              color: "#666",
+              color: "var(--text-muted)",
               fontSize: "13px",
               margin: 0,
-              fontWeight: 500,
             }}
           >
             Due: {dueDate}
           </p>
-
-          <div>
-            {hasFile ? (
-              <button
-                onClick={function () {
-                  window.open(fileUrl, "_blank");
-                }}
-                style={{
-                  background: "#eff6ff",
-                  color: "#2563eb",
-                  padding: "5px 12px",
-                  borderRadius: "6px",
-                  fontSize: "12px",
-                  fontWeight: 500,
-                  border: "1px solid #bfdbfe",
-                  cursor: "pointer",
-                }}
-              >
-                Download File
-              </button>
-            ) : null}
-          </div>
+          {hasFile ? (
+            <button
+              onClick={function () {
+                window.open(fileUrl, "_blank");
+              }}
+              style={{
+                background: "#eff6ff",
+                color: "#2563eb",
+                padding: "5px 14px",
+                borderRadius: "8px",
+                fontSize: "12px",
+                fontWeight: 500,
+                border: "1px solid #bfdbfe",
+                cursor: "pointer",
+              }}
+            >
+              Download File
+            </button>
+          ) : null}
         </div>
       </div>
     );
   }
 
   return (
-    <div style={{ background: "#f8fafc", minHeight: "100vh" }}>
-      <Navbar />
-      <div
-        style={{ maxWidth: "800px", margin: "0 auto", padding: "2rem 1rem" }}
-      >
+    <Layout>
+      <div style={{ maxWidth: "860px", margin: "0 auto" }}>
         <div style={{ marginBottom: "1.5rem" }}>
-          <h2 style={{ fontSize: "22px", fontWeight: 600, color: "#1e293b" }}>
+          <h2
+            style={{ fontSize: "24px", fontWeight: 700, color: "var(--text)" }}
+          >
             My Assignments
           </h2>
-          <p style={{ color: "#666", fontSize: "14px", marginTop: "4px" }}>
-            Welcome, {auth.user ? auth.user.name : ""} - all upcoming
+          <p
+            style={{
+              color: "var(--text-muted)",
+              fontSize: "14px",
+              marginTop: "2px",
+            }}
+          >
+            Welcome, {auth.user ? auth.user.name : ""} — all upcoming
             assignments
           </p>
         </div>
 
+        <div
+          style={{
+            display: "flex",
+            gap: "1rem",
+            marginBottom: "2rem",
+            flexWrap: "wrap",
+          }}
+        >
+          <StatCard value={dueToday} label="Due Today" color="#dc2626" />
+          <StatCard value={urgent} label="Urgent (2 days)" color="#d97706" />
+          <StatCard value={total} label="Total Upcoming" color="#2563eb" />
+        </div>
+
         {loading ? (
-          <p style={{ color: "#666" }}>Loading assignments...</p>
+          <p style={{ color: "var(--text-muted)" }}>Loading assignments...</p>
+        ) : assignments.length === 0 ? (
+          <div
+            style={{
+              background: "var(--card)",
+              padding: "3rem",
+              borderRadius: "12px",
+              textAlign: "center",
+            }}
+          >
+            <p style={{ fontSize: "48px", marginBottom: "1rem" }}>🎉</p>
+            <p style={{ color: "var(--text-muted)", fontWeight: 500 }}>
+              No upcoming assignments.
+            </p>
+            <p
+              style={{
+                color: "var(--text-muted)",
+                fontSize: "14px",
+                marginTop: "4px",
+              }}
+            >
+              You are all caught up.
+            </p>
+          </div>
         ) : (
           <div>
             <div
               style={{
                 display: "flex",
                 gap: "1rem",
-                marginBottom: "1.5rem",
+                marginBottom: "1rem",
                 flexWrap: "wrap",
               }}
             >
-              <StatCard value={dueToday} label="Due Today" color="#dc2626" />
-              <StatCard
-                value={urgent}
-                label="Urgent (2 days)"
-                color="#d97706"
-              />
-              <StatCard value={total} label="Total Upcoming" color="#2563eb" />
-            </div>
-
-            {assignments.length === 0 ? (
-              <div
+              <select
+                value={subject}
+                onChange={function (e) {
+                  setSubject(e.target.value);
+                }}
                 style={{
-                  background: "white",
-                  padding: "3rem",
-                  borderRadius: "12px",
-                  textAlign: "center",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
+                  flex: 1,
+                  minWidth: "160px",
+                  padding: "8px 12px",
+                  border: "1px solid var(--border)",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  background: "var(--card)",
+                  color: "var(--text)",
                 }}
               >
-                <p style={{ fontSize: "48px", marginBottom: "1rem" }}>🎉</p>
-                <p style={{ color: "#666", fontWeight: 500 }}>
-                  No upcoming assignments.
-                </p>
-                <p
-                  style={{ color: "#999", fontSize: "14px", marginTop: "4px" }}
-                >
-                  You are all caught up.
+                {getSubjects().map(function (s) {
+                  return (
+                    <option key={s} value={s}>
+                      {s}
+                    </option>
+                  );
+                })}
+              </select>
+
+              <select
+                value={sort}
+                onChange={function (e) {
+                  setSort(e.target.value);
+                }}
+                style={{
+                  flex: 1,
+                  minWidth: "160px",
+                  padding: "8px 12px",
+                  border: "1px solid var(--border)",
+                  borderRadius: "8px",
+                  fontSize: "14px",
+                  background: "var(--card)",
+                  color: "var(--text)",
+                }}
+              >
+                <option value="asc">Earliest First</option>
+                <option value="desc">Latest First</option>
+              </select>
+            </div>
+
+            {filtered.length === 0 ? (
+              <div
+                style={{
+                  background: "var(--card)",
+                  padding: "2rem",
+                  borderRadius: "12px",
+                  textAlign: "center",
+                }}
+              >
+                <p style={{ color: "var(--text-muted)" }}>
+                  No assignments found for this subject.
                 </p>
               </div>
             ) : (
-              <div>
-                <div
-                  style={{
-                    display: "flex",
-                    gap: "1rem",
-                    marginBottom: "1rem",
-                    flexWrap: "wrap",
-                    alignItems: "center",
-                  }}
-                >
-                  <div style={{ flex: 1, minWidth: "160px" }}>
-                    <select
-                      value={subject}
-                      onChange={function (e) {
-                        setSubject(e.target.value);
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        background: "white",
-                      }}
-                    >
-                      {getSubjects().map(function (s) {
-                        return (
-                          <option key={s} value={s}>
-                            {s}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </div>
-
-                  <div style={{ flex: 1, minWidth: "160px" }}>
-                    <select
-                      value={sort}
-                      onChange={function (e) {
-                        setSort(e.target.value);
-                      }}
-                      style={{
-                        width: "100%",
-                        padding: "8px 12px",
-                        border: "1px solid #ddd",
-                        borderRadius: "8px",
-                        fontSize: "14px",
-                        background: "white",
-                      }}
-                    >
-                      <option value="asc">Due Date - Earliest First</option>
-                      <option value="desc">Due Date - Latest First</option>
-                    </select>
-                  </div>
-                </div>
-
-                {filtered.length === 0 ? (
-                  <div
-                    style={{
-                      background: "white",
-                      padding: "2rem",
-                      borderRadius: "12px",
-                      textAlign: "center",
-                    }}
-                  >
-                    <p style={{ color: "#666" }}>
-                      No assignments found for this subject.
-                    </p>
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "1rem",
-                    }}
-                  >
-                    {filtered.map(function (a) {
-                      return <AssignmentCard key={a.id} assignment={a} />;
-                    })}
-                  </div>
-                )}
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "1rem",
+                }}
+              >
+                {filtered.map(function (a) {
+                  return <AssignmentCard key={a.id} assignment={a} />;
+                })}
               </div>
             )}
           </div>
         )}
       </div>
-    </div>
+    </Layout>
   );
 }

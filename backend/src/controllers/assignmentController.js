@@ -11,7 +11,6 @@ async function postAssignment(req, res) {
     const { title, subject, batch_id, due_date, description } = req.body;
     const faculty_id = req.user.id;
 
-    // File info from multer (if file was uploaded)
     const file_name = req.file ? req.file.filename : null;
     const file_path = req.file ? req.file.path : null;
     const file_original = req.file ? req.file.originalname : null;
@@ -64,7 +63,7 @@ async function listUpcomingDeadlines(req, res) {
     const assignments = await Assignment.findAll({
       where: {
         batch_id: req.user.batch_id,
-        due_date: { [Op.gte]: now }, // show ALL future assignments
+        due_date: { [Op.gte]: now },
       },
       include: [
         {
@@ -101,4 +100,26 @@ async function listAllAssignments(req, res) {
   }
 }
 
-module.exports = { postAssignment, listUpcomingDeadlines, listAllAssignments };
+// ─── 4. DELETE ASSIGNMENT (faculty only) ─────────────────────────
+async function deleteAssignment(req, res) {
+  try {
+    const assignment = await Assignment.findByPk(req.params.id);
+
+    if (!assignment) {
+      return res.status(404).json({ error: "Assignment not found" });
+    }
+
+    // Removed ownership check for now — any faculty can delete
+    await assignment.destroy();
+    res.json({ message: "Assignment deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+
+module.exports = {
+  postAssignment,
+  listUpcomingDeadlines,
+  listAllAssignments,
+  deleteAssignment,
+};
